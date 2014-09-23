@@ -4,6 +4,7 @@ import json
 import json.encoder
 from overpass import parser as overpass_parser
 
+destdir = "/var/www/bitcoinmap"
 scriptdir = os.path.dirname(os.path.abspath(__file__))
 
 coins = {
@@ -28,4 +29,4 @@ for name, parser in parsers.iteritems():
 	pts = pts1 + pts2
 		
 	json.encoder.FLOAT_REPR = lambda x: str(x) # fix for 52.1989256 showing as 52.198925299999999
-	json.dump(pts, open(scriptdir + '/bitcoin.json', 'w'), separators = (',\n', ':'))
+	json.dump(pts, open(destdir + '/bitcoin.json', 'w'), separators = (',\n', ':'))
