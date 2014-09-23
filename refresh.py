@@ -4,7 +4,7 @@ import json
 import json.encoder
 from overpass import parser as overpass_parser
 
-destdir = "/var/www/bitcoinmap"
+destdir = "/var/www/data/bitcoinmap"
 scriptdir = os.path.dirname(os.path.abspath(__file__))
 
 coins = {
