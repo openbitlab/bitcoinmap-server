@@ -210,19 +210,19 @@ def get_points(coin = 'bitcoin', iso = 'XBT'):
 		else:
 			continue
 
-		#elif typ == 'way':
-		#	try:
-		#		lat, lon = nodes[e['nodes'][0]] # extract coordinate of first node
-		#	except:
-		#		continue
-		#	ways[ide] = (lat, lon)
-		#	if tags.get('payment:%s' % coin) != 'yes' and tags.get('currency:%s' % iso) != 'yes': # ways that are part of relation
-		#		continue
-		#elif typ == 'relation':
-		#	try:
-		#		lat, lon = ways[e['members'][0]['ref']]
-		#	except:
-		#		continue
+		elif typ == 'way':
+			try:
+				lat, lon = nodes[e['nodes'][0]] # extract coordinate of first node
+			except:
+				continue
+			ways[ide] = (lat, lon)
+			if tags.get('payment:%s' % coin) != 'yes' and tags.get('currency:%s' % iso) != 'yes': # ways that are part of relation
+				continue
+		elif typ == 'relation':
+			try:
+				lat, lon = ways[e['members'][0]['ref']]
+			except:
+				continue
 
 		if not lat or not lon:
 			continue
