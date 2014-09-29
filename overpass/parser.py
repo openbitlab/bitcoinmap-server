@@ -207,9 +207,6 @@ def get_points(coin = 'bitcoin', iso = 'XBT'):
 			nodes[ide] = (lat, lon)
 			if tags.get('payment:%s' % coin) != 'yes' and tags.get('currency:%s' % iso) != 'yes': # nodes that are part of way (i.e. not accepting coins)
 				continue
-		else:
-			continue
-
 		elif typ == 'way':
 			try:
 				lat, lon = nodes[e['nodes'][0]] # extract coordinate of first node
