@@ -193,7 +193,7 @@ def get_points(coin = 'bitcoin', iso = 'XBT'):
 	boundings = []
 	for x in range (-90, 90, 10):
 		for y in range (-180, 180, 10):
-			boundings.append ('('+str(x)+','+str(y)+','+str(x+30)+','+str(y+30)+')')
+			boundings.append ('('+str(x)+','+str(y)+','+str(x+10)+','+str(y+10)+')')
 	
 	
 	for xbb in boundings:
