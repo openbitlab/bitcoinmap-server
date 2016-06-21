@@ -197,9 +197,7 @@ def get_points(coin = 'bitcoin', iso = 'XBT'):
 	
 	for xbb in boundings:
 		print 'Processing boundings:', xbb
-		resp = requests.get('http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json][timeout:600];(node["payment:bitcoin"=yes]'+xbb+';way["payment:bitcoin"=yes]'+xbb+';>;);out;')
-	
-		#(node["payment:%(coin)s"=yes];>;way["payment:%(coin)s"=yes]'+xbb+';>;relation["payment:%(coin)s"=yes]'+xbb+';>;node["currency:%(iso)s"=yes]'+xbb+';>;way["currency:%(iso)s"=yes]'+xbb+';>;relation["currency:%(iso)s"=yes]'+xbb+';);out;' % {"coin": coin, "iso": iso});
+		resp = requests.get('http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json][timeout:600];(node["payment:%(coin)s"=yes];>;way["payment:%(coin)s"=yes]'+xbb+';>;relation["payment:%(coin)s"=yes]'+xbb+';>;node["currency:%(iso)s"=yes]'+xbb+';>;way["currency:%(iso)s"=yes]'+xbb+';>;relation["currency:%(iso)s"=yes]'+xbb+';);out;' % {"coin": coin, "iso": iso});
 	
 		#print resp, resp.text
 		try:
