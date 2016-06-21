@@ -22,8 +22,13 @@ import os
 import json
 import json.encoder
 from overpass import parser as overpass_parser
+import sys
 
-destdir = "/var/www/data/bitcoinmap"
+if len (sys.argv) == 2:
+	destidr = sys.argv[1]
+else:
+	destdir = "/var/www/data/bitcoinmap"
+
 scriptdir = os.path.dirname(os.path.abspath(__file__))
 
 coins = {

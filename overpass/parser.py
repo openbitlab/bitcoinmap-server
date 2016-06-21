@@ -188,79 +188,91 @@ def determine_icon(tags, coin = 'bitcoin'):
 
 def get_points(coin = 'bitcoin', iso = 'XBT'):
 	points = []
-	resp = requests.get('http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json][timeout:600];(node["payment:bitcoin"=yes];way["payment:bitcoin"=yes];>;);out;')
 	
-	#(node["payment:%(coin)s"=yes];>;way["payment:%(coin)s"=yes];>;relation["payment:%(coin)s"=yes];>;node["currency:%(iso)s"=yes];>;way["currency:%(iso)s"=yes];>;relation["currency:%(iso)s"=yes];);out;' % {"coin": coin, "iso": iso});
+	boundings = []
+	for x in range (-90, 90, 30):
+		for y in range (-180, 180, 30):
+			boundings.append ('('+str(x)+','+str(y)+','+str(x+30)+','+str(y+30)+')')
 	
-	print resp, resp.text
-	try:
-		resp = resp.json ()
-	except:
-		resp = resp.json
 	
-	print len(resp['elements'])
-	for e in resp['elements']:
-		lat = e.get('lat', None)
-		lon = e.get('lon', None)
-		typ = e['type']
-		tags = e.get('tags', {})
-		ide = e['id']
-
-		if typ == 'node':
-			nodes[ide] = (lat, lon)
-			if tags.get('payment:%s' % coin) != 'yes' and tags.get('currency:%s' % iso) != 'yes': # nodes that are part of way (i.e. not accepting coins)
-				continue
-		elif typ == 'way':
-			try:
-				lat, lon = nodes[e['nodes'][0]] # extract coordinate of first node
-			except:
-				continue
-			ways[ide] = (lat, lon)
-			if tags.get('payment:%s' % coin) != 'yes' and tags.get('currency:%s' % iso) != 'yes': # ways that are part of relation
-				continue
-		elif typ == 'relation':
-			try:
-				lat, lon = ways[e['members'][0]['ref']]
-			except:
-				continue
-
-		if not lat or not lon:
+	for xbb in boundings:
+		print 'Processing boundings:', xbb
+		resp = requests.get('http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json][timeout:600];(node["payment:bitcoin"=yes]'+xbb+';way["payment:bitcoin"=yes]'+xbb+';>;);out;')
+	
+		#(node["payment:%(coin)s"=yes];>;way["payment:%(coin)s"=yes]'+xbb+';>;relation["payment:%(coin)s"=yes]'+xbb+';>;node["currency:%(iso)s"=yes]'+xbb+';>;way["currency:%(iso)s"=yes]'+xbb+';>;relation["currency:%(iso)s"=yes]'+xbb+';);out;' % {"coin": coin, "iso": iso});
+	
+		#print resp, resp.text
+		try:
+			resp = resp.json ()
+		except:
+			resp = resp.json
+	
+		print 'Found:', len(resp['elements']), 'elements'
+		if len (resp['elements']) == 0:
 			continue
+		
+		for e in resp['elements']:
+			lat = e.get('lat', None)
+			lon = e.get('lon', None)
+			typ = e['type']
+			tags = e.get('tags', {})
+			ide = e['id']
 
-		if 'name' in tags:
-			name = tags['name']
-		else:
-			continue
-		#	name = '%s %s' % (typ, ide)
+			if typ == 'node':
+				nodes[ide] = (lat, lon)
+				if tags.get('payment:%s' % coin) != 'yes' and tags.get('currency:%s' % iso) != 'yes': # nodes that are part of way (i.e. not accepting coins)
+					continue
+			elif typ == 'way':
+				try:
+					lat, lon = nodes[e['nodes'][0]] # extract coordinate of first node
+				except:
+					continue
+				ways[ide] = (lat, lon)
+				if tags.get('payment:%s' % coin) != 'yes' and tags.get('currency:%s' % iso) != 'yes': # ways that are part of relation
+					continue
+			elif typ == 'relation':
+				try:
+					lat, lon = ways[e['members'][0]['ref']]
+				except:
+					continue
 
-		icon = determine_icon(tags, coin)
-		point = {'lat': lat, 'lon': lon, 'title': name, 'icon': icon}
+			if not lat or not lon:
+				continue
 
-		#if 'addr:street' in tags:
-		#	point['addr'] = '%s %s' % (tags.get('addr:street', ''), tags.get('addr:housenumber', ''))
-		#if 'addr:city' in tags:
-		#	point['city'] = '%s %s' % (tags.get('addr:postcode', ''), tags.get('addr:city', ''))
-		#if 'addr:country' in tags:
-		#	point['country'] = tags.get('addr:country', '')
-		if 'contact:website' in tags:
-			w = tags['contact:website']
-			if w.startswith('http://') or w.startswith('https://'):
-				point['web'] = w
-		elif 'website' in tags:
-			w = tags['website']
-			if w.startswith('http://') or w.startswith('https://'):
-				point['web'] = w
-		#if 'contact:email' in tags:
-		#	point['email'] = tags['contact:email']
-		#elif 'email' in tags:
-		#	point['email'] = tags['email']
-		if 'contact:phone' in tags:
-			point['phone'] = tags['contact:phone']
-		elif 'phone' in tags:
-			point['phone'] = tags['phone']
-		if 'description' in tags:
-			point['desc'] = tags['description']
+			if 'name' in tags:
+				name = tags['name']
+			else:
+				continue
+			#	name = '%s %s' % (typ, ide)
 
-		points.append(point)
+			icon = determine_icon(tags, coin)
+			point = {'lat': lat, 'lon': lon, 'title': name, 'icon': icon}
+
+			#if 'addr:street' in tags:
+			#	point['addr'] = '%s %s' % (tags.get('addr:street', ''), tags.get('addr:housenumber', ''))
+			#if 'addr:city' in tags:
+			#	point['city'] = '%s %s' % (tags.get('addr:postcode', ''), tags.get('addr:city', ''))
+			#if 'addr:country' in tags:
+			#	point['country'] = tags.get('addr:country', '')
+			if 'contact:website' in tags:
+				w = tags['contact:website']
+				if w.startswith('http://') or w.startswith('https://'):
+					point['web'] = w
+			elif 'website' in tags:
+				w = tags['website']
+				if w.startswith('http://') or w.startswith('https://'):
+					point['web'] = w
+			#if 'contact:email' in tags:
+			#	point['email'] = tags['contact:email']
+			#elif 'email' in tags:
+			#	point['email'] = tags['email']
+			if 'contact:phone' in tags:
+				point['phone'] = tags['contact:phone']
+			elif 'phone' in tags:
+				point['phone'] = tags['phone']
+			if 'description' in tags:
+				point['desc'] = tags['description']
+
+			points.append(point)
 
 	return points
