@@ -191,9 +191,9 @@ def get_points(coin = 'bitcoin', iso = 'XBT'):
 	resp = requests.get('http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];(node["payment:%(coin)s"=yes];>;way["payment:%(coin)s"=yes];>;relation["payment:%(coin)s"=yes];>;node["currency:%(iso)s"=yes];>;way["currency:%(iso)s"=yes];>;relation["currency:%(iso)s"=yes];);out;' % {"coin": coin, "iso": iso});
 	
 	try:
-		resp = resp.json
-	except:
 		resp = resp.json ()
+	except:
+		resp = resp.json
 	
 	print len(resp['elements'])
 	for e in resp['elements']:
