@@ -188,8 +188,11 @@ def determine_icon(tags, coin = 'bitcoin'):
 
 def get_points(coin = 'bitcoin', iso = 'XBT'):
 	points = []
-	resp = requests.get('http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json];(node["payment:%(coin)s"=yes];>;way["payment:%(coin)s"=yes];>;relation["payment:%(coin)s"=yes];>;node["currency:%(iso)s"=yes];>;way["currency:%(iso)s"=yes];>;relation["currency:%(iso)s"=yes];);out;' % {"coin": coin, "iso": iso});
+	resp = requests.get('http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json][timeout:600];(node["payment:bitcoin"=yes];way["payment:bitcoin"=yes];>;);out;')
 	
+	#(node["payment:%(coin)s"=yes];>;way["payment:%(coin)s"=yes];>;relation["payment:%(coin)s"=yes];>;node["currency:%(iso)s"=yes];>;way["currency:%(iso)s"=yes];>;relation["currency:%(iso)s"=yes];);out;' % {"coin": coin, "iso": iso});
+	
+	print resp, resp.text
 	try:
 		resp = resp.json ()
 	except:
