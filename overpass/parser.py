@@ -193,7 +193,7 @@ def get_points():
 	
 	
 	boundings = []
-	step = 15
+	step = 180
 	for x in range (-90, 90, step):
 		for y in range (-180, 180, step):
 			boundings.append ('('+str(x)+','+str(y)+','+str(x+step)+','+str(y+step)+')')
