@@ -193,14 +193,14 @@ def get_points():
 	
 	
 	boundings = []
-	step = 45
+	step = 15
 	for x in range (-90, 90, step):
 		for y in range (-180, 180, step):
 			boundings.append ('('+str(x)+','+str(y)+','+str(x+step)+','+str(y+step)+')')
 	
 	
 	for xbb in boundings:
-		time.sleep(6)
+		time.sleep(10)
 		print ('Processing boundings:', xbb)
 		resp = requests.get('http://overpass-api.de/api/interpreter?data=[out:json][timeout:600];(node["payment:bitcoin"=yes]'+xbb+';node["payment:litecoin"=yes]'+xbb+';node["payment:criptocurrencies"=yes]'+xbb+';way["payment:bitcoin"=yes]'+xbb+';way["payment:criptocurrencies"=yes]'+xbb+';way["payment:litecoin"=yes]'+xbb+';>;);out;')
 	
