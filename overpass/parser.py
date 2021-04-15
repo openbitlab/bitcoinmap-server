@@ -1,5 +1,6 @@
 #
 # Copyright (c) 2013-2014 Pavol Rusnak <stick@gk2.sk>
+# Copyright (c) 2014-2021 Davide Gessa <gessadavide@gmail.com>
 #
 # This file is part of Coinmap
 #
@@ -18,6 +19,7 @@
 #
 
 import requests
+import time
 
 icon_mapping = {
 'aeroway:aerodrome': 'transport_airport',
@@ -186,30 +188,26 @@ def determine_icon(tags, coin = 'bitcoin'):
 	icon = icon.replace('-', '_')
 	return icon
 
-def get_points(coin = 'bitcoin', iso = 'XBT'):
+def get_points():
 	points = []
 	
 	
 	boundings = []
-	for x in range (-90, 90, 10):
-		for y in range (-180, 180, 10):
-			boundings.append ('('+str(x)+','+str(y)+','+str(x+10)+','+str(y+10)+')')
+	step = 45
+	for x in range (-90, 90, step):
+		for y in range (-180, 180, step):
+			boundings.append ('('+str(x)+','+str(y)+','+str(x+step)+','+str(y+step)+')')
 	
 	
 	for xbb in boundings:
-		print 'Processing boundings:', xbb
-		resp = requests.get('http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json][timeout:600];(node["payment:bitcoin"=yes]'+xbb+';way["payment:bitcoin"=yes]'+xbb+';>;);out;')
+		time.sleep(6)
+		print ('Processing boundings:', xbb)
+		resp = requests.get('http://overpass-api.de/api/interpreter?data=[out:json][timeout:600];(node["payment:bitcoin"=yes]'+xbb+';node["payment:litecoin"=yes]'+xbb+';node["payment:criptocurrencies"=yes]'+xbb+';way["payment:bitcoin"=yes]'+xbb+';way["payment:criptocurrencies"=yes]'+xbb+';way["payment:litecoin"=yes]'+xbb+';>;);out;')
 	
-		#resp = requests.get('http://overpass.osm.rambler.ru/cgi/interpreter?data=[out:json][timeout:600];(node["payment:%(coin)s"=yes]'+xbb+';>;way["payment:%(coin)s"=yes]'+xbb+';>;relation["payment:%(coin)s"=yes]'+xbb+';>;node["currency:%(iso)s"=yes]'+xbb+';>;way["currency:%(iso)s"=yes]'+xbb+';>;relation["currency:%(iso)s"=yes]'+xbb+';);out;' % {"coin": coin, "iso": iso});
+		resp = resp.json ()
 	
-		#print resp, resp.text
-		try:
-			resp = resp.json ()
-		except:
-			resp = resp.json
-	
-		print 'Found:', len(resp['elements']), 'elements'
-		print 'Total:', len(points)
+		print ('Found:', len(resp['elements']), 'elements')
+		print ('Total:', len(points))
 		if len (resp['elements']) == 0:
 			continue
 		
@@ -222,7 +220,7 @@ def get_points(coin = 'bitcoin', iso = 'XBT'):
 
 			if typ == 'node':
 				nodes[ide] = (lat, lon)
-				if tags.get('payment:%s' % coin) != 'yes' and tags.get('currency:%s' % iso) != 'yes': # nodes that are part of way (i.e. not accepting coins)
+				if tags.get('payment:bitcoin') != 'yes' and tags.get('payment:litecoin') != 'yes' and tags.get('payment:cryptocurrencies') != 'yes' and tags.get('currency:bitcoin') != 'yes': # nodes that are part of way (i.e. not accepting coins)
 					continue
 			elif typ == 'way':
 				try:
@@ -230,7 +228,7 @@ def get_points(coin = 'bitcoin', iso = 'XBT'):
 				except:
 					continue
 				ways[ide] = (lat, lon)
-				if tags.get('payment:%s' % coin) != 'yes' and tags.get('currency:%s' % iso) != 'yes': # ways that are part of relation
+				if tags.get('payment:bitcoin') != 'yes' and tags.get('payment:litecoin') != 'yes' and tags.get('payment:cryptocurrencies') != 'yes' and tags.get('currency:bitcoin') != 'yes': # ways that are part of relation
 					continue
 			elif typ == 'relation':
 				try:
@@ -247,7 +245,7 @@ def get_points(coin = 'bitcoin', iso = 'XBT'):
 				continue
 			#	name = '%s %s' % (typ, ide)
 
-			icon = determine_icon(tags, coin)
+			icon = determine_icon(tags)
 			point = {'lat': lat, 'lon': lon, 'title': name, 'icon': icon}
 
 			#if 'addr:street' in tags:

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #
 # Copyright (c) 2013-2014 Pavol Rusnak <stick@gk2.sk>
+# Copyright (c) 2014-2021 Davide Gessa <gessadavide@gmail.com>
 #
 # This file is part of Coinmap
 #
@@ -31,26 +32,21 @@ else:
 
 scriptdir = os.path.dirname(os.path.abspath(__file__))
 
-coins = {
-	'Bitcoin': 'XBT',
-	'Litecoin': 'XLT',
-}
 
 parsers = {
 	'overpass': overpass_parser,
 }
 
-# update data/currencies
-with open(scriptdir + '/coins.js', 'w') as f:
-	f.write('function get_coins() { return ["%s"]; }\n' % '", "'.join(sorted(coins.keys())))
 
 # call individual parsers
-for name, parser in parsers.iteritems():
+for name in parsers:
+	parser = parsers[name]
 	pts = []
 	
-	pts1 = parser.get_points('bitcoin',coins['Bitcoin'])
-	pts2 = [] #parser.get_points('litecoin',coins['Litecoin'])
-	pts = pts1 + pts2
+	pts = parser.get_points()
 		
 	json.encoder.FLOAT_REPR = lambda x: str(x) # fix for 52.1989256 showing as 52.198925299999999
-	json.dump(pts, open(destdir + '/bitcoin.json', 'w'), separators = (',\n', ':'))
+	try:
+		json.dump(pts, open(destdir + '/bitcoin.json', 'w'), separators = (',\n', ':'))
+	except:
+		json.dump(pts, open('./bitcoin.json', 'w'), separators = (',\n', ':'))
